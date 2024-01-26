@@ -48,7 +48,7 @@ def schedule_a(**params): #Schedule A records describe itemized receipts, includ
     last_index["last_contribution_receipt_date"] = new_index.get("last_contribution_receipt_date", None)
     last_index["last_index"] = new_index["last_index"]
     number = 0
-    while last_index["last_contribution_receipt_date"] is not None and number <= 500: #FIX ME: You have a limited amount of API calls (1000 calls per hour), figure out a work around.
+    while last_index["last_contribution_receipt_date"] is not None and number <= 50: #FIX ME: You have a limited amount of API calls (1000 calls per hour), figure out a work around.
         rec_url = f"https://api.open.fec.gov/v1/schedules/schedule_a/?last_contribution_receipt_date={new_index['last_contribution_receipt_date']}&two_year_transaction_period=2024&per_page=100&last_index={new_index['last_index']}&sort=-contribution_receipt_date&sort_hide_null=false&sort_null_only=false&api_key={params['api_key']}"
         page_req = requests.get(rec_url)
         page_res = page_req.json()
@@ -68,5 +68,5 @@ def schedule_a(**params): #Schedule A records describe itemized receipts, includ
 # def schedule_c(**params): #Schedule C shows all loans, endorsements and loan guarantees a committee receives or makes.
 
 # def schedule_d(**params): #Schedule D, it shows debts and obligations owed to or by the committee that are required to be disclosed.
-
+candidates(**fec_params)
 # comittees(**fec_params)

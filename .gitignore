@@ -160,4 +160,5 @@ cython_debug/
 #.idea/
 
 #Files that are too large (will be in S3)
-itcont.txt
+*.csv
+*zip

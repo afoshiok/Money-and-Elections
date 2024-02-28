@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS candidates (
     cand_id varchar(9),
     cand_name varchar(200),
-    cand_pty_affiliation var(3),
+    cand_pty_affiliation varchar(3),
     cand_election_tear number(4),
     cand_office_st varchar(2),
     cand_office varchar(1),

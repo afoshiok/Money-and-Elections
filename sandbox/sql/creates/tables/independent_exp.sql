@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS independent _expenditures (
+CREATE TABLE IF NOT EXISTS independent_expenditures (
     sub_id varchar(9),
     cmte_id varchar(9),
     amndt_id varchar(1),

@@ -5,6 +5,7 @@ import pendulum
 from pendulum import datetime, duration 
 import requests
 import os
+import zipfile
 import pandas as pd
 
 default_args = {
@@ -25,6 +26,7 @@ def committee_ingestion():
     run_date = pendulum.now().to_date_string()
     zip_path = "./file_store/zipped/"
     unzipped_path = "./file_store/unzipped/"
+    final_path = "./file_store/final/"
 
     @task #Example of TaskFlow use, here's the docs: https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/taskflow.html
     def begin():
@@ -36,6 +38,9 @@ def committee_ingestion():
 
         if not os.path.exists(unzipped_path):
             os.makedirs(unzipped_path)
+
+        if not os.path.exists(final_path):
+            os.makedirs(final_path)
 
         
         committees_header_url = "https://www.fec.gov/files/bulk-downloads/data_dictionaries/cm_header_file.csv"
@@ -58,17 +63,39 @@ def committee_ingestion():
         
     
     @task
-    def clean_up():
-        os.remove(zip_path + f"{run_date}_cm24.zip")
-        os.remove(unzipped_path + f"{run_date}_committees_headers.csv")
-        os.removedirs(zip_path)
-        os.removedirs(unzipped_path)
+    def extract_files():
+        committees_zip_path = zip_path + f"{run_date}_cm24.zip"
+        extract_output = unzipped_path + f"{run_date}_cm24/"
+        with zipfile.ZipFile(committees_zip_path) as extracted_cm24:
+            extracted_cm24.extractall(extract_output)
 
+    @task
+    def process_data():
+        header_file = unzipped_path + f"{run_date}_committees_headers.csv"
+        committee_file = unzipped_path + f"{run_date}_cm24/" + "cm.txt"
+        #Adding headers to Committe data
+        committee_header = pd.read_csv(header_file)
+        committee_df = pd.read_csv(committee_file, sep="|", names=committee_header.columns)
+        export_path = final_path + f"{run_date}_cm24.csv"
+
+        committee_df.to_csv(export_path, sep=",", index=False)
+
+
+
+    # @task
+    # def clean_up():
+    #     os.remove(unzipped_path + f"{run_date}_cm24/cm.txt")
+    #     os.removedirs(unzipped_path + f"{run_date}_cm24/")
+    #     os.remove(zip_path + f"{run_date}_cm24.zip")
+    #     os.remove(unzipped_path + f"{run_date}_committees_headers.csv")
+    #     os.removedirs(zip_path)
+    #     os.removedirs(unzipped_path)
 
     @task
     def end():
         EmptyOperator(task_id="end")
 
-    begin() >> [ download_header_file() , download_zipped_file() ] >> clean_up() >> end()
+    # begin() >> [ download_header_file() , download_zipped_file() ] >> extract_files() >> process_data() >> clean_up() >> end()
+    begin() >> [ download_header_file() , download_zipped_file() ] >> extract_files() >> process_data() >> end()
 
 committee_ingestion()

@@ -25,6 +25,11 @@ default_args = {
     start_date=datetime(2024, 1, 1), schedule="@once", default_args=default_args
 )
 def committee_ingestion():
+    """
+    This DAG downloads the Committees bulk data from the FEC website, unzips the folder, does some minor processing and places the 
+    final .csv in a S3 bucket. 
+    
+    """
     run_date = pendulum.now().to_date_string()
     zip_path = "./file_store/committees/zipped/"
     unzipped_path = "./file_store/committees/unzipped/"

@@ -1,10 +1,12 @@
 from airflow.decorators import dag, task
 from airflow.operators.empty import EmptyOperator
+from airflow.hooks.S3_hook import S3Hook
 
 import pendulum
 from pendulum import datetime, duration 
 import requests
 import os
+import shutil 
 import zipfile
 import pandas as pd
 
@@ -24,9 +26,9 @@ default_args = {
 )
 def committee_ingestion():
     run_date = pendulum.now().to_date_string()
-    zip_path = "./file_store/zipped/"
-    unzipped_path = "./file_store/unzipped/"
-    final_path = "./file_store/final/"
+    zip_path = "./file_store/committees/zipped/"
+    unzipped_path = "./file_store/committees/unzipped/"
+    final_path = "./file_store/committees/final/"
 
     @task #Example of TaskFlow use, here's the docs: https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/taskflow.html
     def begin():
@@ -80,22 +82,24 @@ def committee_ingestion():
 
         committee_df.to_csv(export_path, sep=",", index=False)
 
-
-
-    # @task
-    # def clean_up():
-    #     os.remove(unzipped_path + f"{run_date}_cm24/cm.txt")
-    #     os.removedirs(unzipped_path + f"{run_date}_cm24/")
-    #     os.remove(zip_path + f"{run_date}_cm24.zip")
-    #     os.remove(unzipped_path + f"{run_date}_committees_headers.csv")
-    #     os.removedirs(zip_path)
-    #     os.removedirs(unzipped_path)
+    @task
+    def upload_to_S3():
+        hook = S3Hook(aws_conn_id='aws_conn')
+        local_path = final_path + f"{run_date}_cm24.csv"
+        hook.load_file(filename=local_path, key=f"s3://fec-data/committees/{run_date}_committees.csv")
 
     @task
     def end():
         EmptyOperator(task_id="end")
 
+    @task
+    def clean_up():
+        shutil.rmtree(zip_path)
+        shutil.rmtree(unzipped_path)
+        shutil.rmtree(final_path)
+        shutil.rmtree("./file_store/committees/")
+
     # begin() >> [ download_header_file() , download_zipped_file() ] >> extract_files() >> process_data() >> clean_up() >> end()
-    begin() >> [ download_header_file() , download_zipped_file() ] >> extract_files() >> process_data() >> end()
+    begin() >> [ download_header_file() , download_zipped_file() ] >> extract_files() >> process_data() >> upload_to_S3() >> clean_up() >> end()
 
 committee_ingestion()

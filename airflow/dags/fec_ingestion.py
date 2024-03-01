@@ -99,7 +99,6 @@ def committee_ingestion():
         shutil.rmtree(final_path)
         shutil.rmtree("./file_store/committees/")
 
-    # begin() >> [ download_header_file() , download_zipped_file() ] >> extract_files() >> process_data() >> clean_up() >> end()
     begin() >> [ download_header_file() , download_zipped_file() ] >> extract_files() >> process_data() >> upload_to_S3() >> clean_up() >> end()
 
 committee_ingestion()

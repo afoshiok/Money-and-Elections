@@ -9,6 +9,7 @@ import os
 import shutil 
 import zipfile
 import pandas as pd
+import io
 
 default_args = {
     "owner": "admin",
@@ -87,10 +88,16 @@ def individual_cont_ingestion():
 
     @task
     def upload_to_S3():
+        #Converting the CSV to ByteIO string to decrease task time.
+        final_indiv_df = pd.read_csv(final_path + f"{run_date}_indiv_cont.csv")
+        csv_buffer = io.BytesIO()
+        final_indiv_df.to_csv(csv_buffer, index=False)
+        csv_buffer.seek(0)
+
         hook = S3Hook(aws_conn_id='aws_conn')
-        local_path = final_path + f"{run_date}_indiv_cont.csv"
-        s3_key = f"s3://fec-data/individual_contributions/{run_date}_indiv_cont.csv" 
-        hook.load_file(filename=local_path, key=s3_key)
+        hook.load_file_obj(file_obj=csv_buffer, key=f"s3://fec-data/individual_contributions/{run_date}_indiv_cont.csv")
+
+        #FIX ME: This took longer (8mins -> 10+mins), might have to try using Boto3 directly
 
     @task
     def clean_up():

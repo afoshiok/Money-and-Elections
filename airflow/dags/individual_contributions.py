@@ -9,8 +9,6 @@ import os
 import shutil 
 import zipfile
 import pandas as pd
-import io
-import boto3
 
 default_args = {
     "owner": "admin",
@@ -90,17 +88,9 @@ def individual_cont_ingestion():
     @task
     def upload_to_S3():
         hook = S3Hook(aws_conn_id='aws_conn')
-        credentials = hook.get_credentials()
-        s3 = boto3.client(
-            "s3",
-            aws_access_key_id=credentials.access_key,
-            aws_secret_access_key=credentials.secret_key
-        )
-        final_indiv_file = final_path + f"{run_date}_indiv_cont.csv"
-
-        s3_key = f"/individual_contributions/{run_date}_indiv_cont.csv"
-        with open(final_indiv_file, "rb") as file:
-            s3.upload_fileobj(file, 'fec-data', s3_key)
+        local_path = final_path + f"{run_date}_indiv_cont.csv"
+        s3_key = f"s3://fec-data/individual_contributions/{run_date}_indiv_cont.csv" 
+        hook.load_file(filename=local_path, key=s3_key)
 
     @task
     def clean_up():

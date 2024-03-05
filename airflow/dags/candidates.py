@@ -52,7 +52,7 @@ def candidate_ingestion():
         with open(header_dir, "wb") as candidates_header:
             candidates_header.write(header_req._content)
 
-    @task()
+    @task
     def download_zipped_file():
         candidate_url = "https://www.fec.gov/files/bulk-downloads/2024/cn24.zip"
         candidate_req = requests.get(candidate_url)
@@ -61,6 +61,37 @@ def candidate_ingestion():
         with open(candidate_dir, "wb") as candidate_zip:
             candidate_zip.write(candidate_req.content)
 
-    begin() >> create_staging_folders() >> [ download_header_file(), download_zipped_file() ] 
+    @task
+    def extract_files():
+        candidate_zip_path = zip_path + f"{run_date}_candidates.zip"
+        source = "cn.txt"
+        extract_path = unzipped_path + f"{run_date}_candidates.csv"
+        with zipfile.ZipFile(candidate_zip_path, "r") as file:
+            file.getinfo(source).filename = extract_path
+            file.extract(source)
+
+    @task
+    def process_data():
+        header_file = unzipped_path + f"{run_date}_candidates_header.csv"
+        candidate_file = unzipped_path + f"{run_date}_candidates.csv"
+
+        candidate_header = pd.read_csv(header_file)
+        candidate_df = pd.read_csv(candidate_file, sep="|", names=candidate_header.columns, dtype={'CAND_OFFICE_DISTRICT': "Int64", "CAND_ZIP" : "Int64"}) #This fixes the issue where pandas with convert Int columns with NaN to float 
+
+        export_path = final_path + f"{run_date}_candidates.csv"
+
+        candidate_df.to_csv(export_path, sep=",", index=False)
+
+    @task
+    def upload_to_S3():
+        hook = S3Hook(aws_conn_id='aws_conn')
+        local_path = final_path + f"{run_date}_candidates.csv"
+        hook.load_file(filename=local_path, key=f"s3://fec-data/candidates/{run_date}_committees.csv")
+
+    @task
+    def end():
+        EmptyOperator(task_id="end")
+
+    begin() >> create_staging_folders() >> [ download_header_file(), download_zipped_file() ] >> extract_files() >> process_data() >> upload_to_S3() >> end()
 
 candidate_ingestion()

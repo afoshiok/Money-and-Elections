@@ -22,7 +22,7 @@ default_args = {
 
 
 @dag(
-    start_date=datetime(2024, 1, 1), schedule="@once", default_args=default_args
+    start_date=datetime(2024, 1, 1), schedule=None, default_args=default_args
 )
 def committee_ingestion():
     """

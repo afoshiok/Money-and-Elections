@@ -87,11 +87,18 @@ def candidate_ingestion():
         hook = S3Hook(aws_conn_id='aws_conn')
         local_path = final_path + f"{run_date}_candidates.csv"
         hook.load_file(filename=local_path, key=f"s3://fec-data/candidates/{run_date}_committees.csv")
+    
+    @task
+    def clean_up():
+        shutil.rmtree(zip_path)
+        shutil.rmtree(unzipped_path)
+        shutil.rmtree(final_path)
+        shutil.rmtree("./file_store/candidates/")
 
     @task
     def end():
         EmptyOperator(task_id="end")
 
-    begin() >> create_staging_folders() >> [ download_header_file(), download_zipped_file() ] >> extract_files() >> process_data() >> upload_to_S3() >> end()
+    begin() >> create_staging_folders() >> [ download_header_file(), download_zipped_file() ] >> extract_files() >> process_data() >> upload_to_S3() >> clean_up() >> end()
 
 candidate_ingestion()

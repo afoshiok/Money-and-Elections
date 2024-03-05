@@ -90,7 +90,6 @@ def candidate_committee_ingestion():
 
     @task
     def clean_up():
-        def clean_up():
         shutil.rmtree(zip_path)
         shutil.rmtree(unzipped_path)
         shutil.rmtree(final_path)
@@ -100,6 +99,6 @@ def candidate_committee_ingestion():
     def end():
         EmptyOperator(task_id="end")
 
-    begin() >> create_staging_folders() >> download_header_file() >> download_zipped_file()  >> extract_files() >> process_data() >> upload_to_S3() >> end()
+    begin() >> create_staging_folders() >> download_header_file() >> download_zipped_file()  >> extract_files() >> process_data() >> upload_to_S3() >> clean_up() >> end()
 
 candidate_committee_ingestion()

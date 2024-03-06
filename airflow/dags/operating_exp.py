@@ -78,24 +78,22 @@ def operating_exp_ingestion():
 
         operating_exp_header = pd.read_csv(header_file)
 
-        def parse_date(date_string):
-         try:
-             return datetime.strptime(date_string, '%m/%d/%Y')
-         except ValueError:
-             return pd.NaT # Return Not-A-Time for invalid or missing dates
+        # def parse_date(date_string):
+        #  try:
+        #      return datetime.strptime(date_string, '%m/%d/%Y')
+        #  except ValueError:
+        #      return pd.NaT # Return Not-A-Time for invalid or missing dates
          
         operating_exp_df = pd.read_csv(operating_exp_file,
                                        sep="|",
                                        names= operating_exp_header.columns,
-                                       parse_dates=["TRANSACTION_DT"],  # Ensure this column is parsed as dates
-                                       date_parser=parse_date,
                                        dtype={
+                                           'TRANSACTION_DT': str,
                                            "ZIP_CODE" : "Int64",
                                            "TRANSACTION_AMT": "Float64"
                                        }
                                        )
         
-
         export_path = final_path + f"{run_date}_operating_exp.csv"
         operating_exp_df.to_csv(export_path, sep=",", index=False)
 

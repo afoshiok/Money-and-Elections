@@ -1,5 +1,4 @@
 CREATE TABLE IF NOT EXISTS committee_transactions (
-    sub_id varchar(9),
     cmte_id varchar(9),
     amndt_id varchar(1),
     rpt_tp varchar(3),
@@ -18,5 +17,6 @@ CREATE TABLE IF NOT EXISTS committee_transactions (
     tran_id varchar(32),
     file_num number(22),
     memo_cd varchar(1),
-    memo_text varchar(100)
+    memo_text varchar(100),
+    sub_id number(19),
 )

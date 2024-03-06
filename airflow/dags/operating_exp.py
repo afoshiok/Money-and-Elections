@@ -86,12 +86,8 @@ def operating_exp_ingestion():
          
         operating_exp_df = pd.read_csv(operating_exp_file,
                                        sep="|",
-                                       names= operating_exp_header.columns,
-                                       dtype={
-                                           'TRANSACTION_DT': str,
-                                           "ZIP_CODE" : "Int64",
-                                           "TRANSACTION_AMT": "Float64"
-                                       }
+                                       names=operating_exp_header.columns,
+                                       dtype= {"ZIP_CODE" : "object", "TRANSACTION_DT": "object", "ENTITY_TP": "object" }
                                        )
         
         export_path = final_path + f"{run_date}_operating_exp.csv"

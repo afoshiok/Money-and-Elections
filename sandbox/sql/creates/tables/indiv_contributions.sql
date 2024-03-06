@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS individual_contributions (
     sub_id varchar(9),
     cmte_id varchar(9),
-    amndt_id varchar(1),
+    amndt_ind varchar(1),
     rpt_tp varchar(3),
     transaction_pgi varchar(5),
     image_num varchar(18),

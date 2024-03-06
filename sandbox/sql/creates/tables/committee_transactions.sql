@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS committee_transactions (
     cmte_id varchar(9),
-    amndt_id varchar(1),
+    amndt_ind varchar(1),
     rpt_tp varchar(3),
     transaction_pgi varchar(5),
     image_num varchar(18),
@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS committee_transactions (
     city varchar(30),
     state varchar(2),
     zip_code varchar(9),
+    employer varchar(38),
     occupation varchar(38),
     transaction_dt date,
     transaction_amt number(14,2),

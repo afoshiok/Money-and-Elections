@@ -78,17 +78,10 @@ def operating_exp_ingestion():
 
         operating_exp_header = pd.read_csv(header_file)
 
-        # def parse_date(date_string):
-        #  try:
-        #      return datetime.strptime(date_string, '%m/%d/%Y')
-        #  except ValueError:
-        #      return pd.NaT # Return Not-A-Time for invalid or missing dates
-         
-        operating_exp_df = pd.read_csv(operating_exp_file,
-                                       sep="|",
-                                       names=operating_exp_header.columns,
-                                       dtype= {"ZIP_CODE" : "object", "TRANSACTION_DT": "object", "ENTITY_TP": "object" }
-                                       )
+        columns = operating_exp_header.columns.tolist()
+        operating_exp_df = pd.read_csv(operating_exp_file, sep="|", header=None, dtype={16: "object"}) #Won't add a header yet, need to drop an extra column.
+        operating_exp_df = operating_exp_df.drop(operating_exp_df.columns[-1], axis=1) #Removing the extra column Pandas added
+        operating_exp_df = operating_exp_df.set_axis(columns, axis=1)
         
         export_path = final_path + f"{run_date}_operating_exp.csv"
         operating_exp_df.to_csv(export_path, sep=",", index=False)

@@ -37,19 +37,19 @@ def transaction_types_ingestion():
 
     @task
     def scrape_data():
-        trans_type_url = "https://www.fec.gov/campaign-finance-data/report-type-code-descriptions/"
-        trans_type_req = requests.get(trans_type_url)
-        trans_type_page = io.StringIO(trans_type_req.text)
-        trans_type_df = pd.read_html(trans_type_page, flavor="lxml", header=0)[0]
+        transaction_types_url = "https://www.fec.gov/campaign-finance-data/transaction-type-code-descriptions/"
+        transaction_types_req = requests.get(transaction_types_url)
+        transaction_types_page = io.StringIO(transaction_types_req.text)
+        transaction_types_df = pd.read_html(transaction_types_page, flavor="lxml", header=0)[0]
 
-        trans_type_path = final_path + f"{run_date}_trans_types.csv"
-        trans_type_df.to_csv(trans_type_path, sep=",", index=False)
+        transaction_types_path = final_path + f"{run_date}_transaction_types.csv"
+        transaction_types_df.to_csv(transaction_types_path, sep=",", index=False)
 
     @task
     def upload_to_S3():
         hook = S3Hook(aws_conn_id='aws_conn')
-        local_path = final_path + f"{run_date}_trans_types.csv"
-        hook.load_file(filename=local_path, key=f"s3://fec-data/transaction_types/{run_date}_trans_types.csv")
+        local_path = final_path + f"{run_date}_transaction_types.csv"
+        hook.load_file(filename=local_path, key=f"s3://fec-data/transaction_types/{run_date}_transaction_types.csv")
 
     @task
     def clean_up():

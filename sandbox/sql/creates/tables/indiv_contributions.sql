@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS individual_contributions (
+CREATE TABLE IF NOT EXISTS src_individual_contributions (
     sub_id varchar(9),
     cmte_id varchar(9),
     amndt_ind varchar(1),

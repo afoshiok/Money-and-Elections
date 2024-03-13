@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS candidates (
+CREATE TABLE IF NOT EXISTS src_candidates (
     cand_id varchar(9),
     cand_name varchar(200),
     cand_pty_affiliation varchar(3),

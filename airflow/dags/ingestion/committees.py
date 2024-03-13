@@ -85,7 +85,7 @@ def committee_ingestion():
         committee_df = pd.read_csv(committee_file, sep="|", names=committee_header.columns)
         export_path = final_path + f"{run_date}_cm24.csv"
 
-        committee_df.to_csv(export_path, sep=",", index=False)
+        committee_df.to_csv(export_path, sep="|", index=False)
 
     @task
     def upload_to_S3():

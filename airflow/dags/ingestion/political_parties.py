@@ -51,7 +51,7 @@ def political_parties_ingestion():
         pp_df = pd.read_html(pp_page, flavor="lxml", header=0)[0]
 
         pp_csv_path = final_path + f"{run_date}_political_parties.csv"
-        pp_df.to_csv(pp_csv_path, sep=",", index=False)
+        pp_df.to_csv(pp_csv_path, sep="|", index=False)
 
     @task
     def upload_to_S3():

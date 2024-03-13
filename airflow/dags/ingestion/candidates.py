@@ -80,7 +80,7 @@ def candidate_ingestion():
 
         export_path = final_path + f"{run_date}_candidates.csv"
 
-        candidate_df.to_csv(export_path, sep=",", index=False)
+        candidate_df.to_csv(export_path, sep="|", index=False)
 
     @task
     def upload_to_S3():

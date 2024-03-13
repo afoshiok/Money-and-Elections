@@ -90,7 +90,7 @@ def independent_exp_ingestion():
             pass
 
         export_path = final_path + f"{run_date}_independent_exp.csv"
-        ind_exp_df.to_csv(export_path, sep=",", index=False)
+        ind_exp_df.to_csv(export_path, sep="|", index=False)
 
     @task
     def upload_to_S3():

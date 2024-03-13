@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS committees (
+CREATE TABLE IF NOT EXISTS src_committees (
     cmte_id varchar(9),
     cmte_nm varchar(200),
     tresnam varchar(90),

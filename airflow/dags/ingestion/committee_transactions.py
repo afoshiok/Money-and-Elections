@@ -86,7 +86,7 @@ def committee_transactions_ingestion():
             pass
 
         export_path = final_path + f"{run_date}_committee_transactions.csv"
-        committee_trans_df.to_csv(export_path, sep=",", index=False)
+        committee_trans_df.to_csv(export_path, sep="|", index=False)
     
     @task
     def upload_to_S3():

@@ -84,7 +84,7 @@ def operating_exp_ingestion():
         operating_exp_df = operating_exp_df.set_axis(columns, axis=1)
         
         export_path = final_path + f"{run_date}_operating_exp.csv"
-        operating_exp_df.to_csv(export_path, sep=",", index=False)
+        operating_exp_df.to_csv(export_path, sep="|", index=False)
 
     @task
     def upload_to_S3():

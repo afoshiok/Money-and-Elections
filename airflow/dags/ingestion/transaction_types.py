@@ -43,7 +43,7 @@ def transaction_types_ingestion():
         transaction_types_df = pd.read_html(transaction_types_page, flavor="lxml", header=0)[0]
 
         transaction_types_path = final_path + f"{run_date}_transaction_types.csv"
-        transaction_types_df.to_csv(transaction_types_path, sep=",", index=False)
+        transaction_types_df.to_csv(transaction_types_path, sep="|", index=False)
 
     @task
     def upload_to_S3():

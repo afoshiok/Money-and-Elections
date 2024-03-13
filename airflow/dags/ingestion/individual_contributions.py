@@ -83,7 +83,7 @@ def individual_cont_ingestion():
         
         export_path = final_path + f"{run_date}_indiv_cont.csv"
 
-        indiv_cont_df.to_csv(export_path, sep=",", index=False)
+        indiv_cont_df.to_csv(export_path, sep="|", index=False)
 
     @task
     def upload_to_S3():

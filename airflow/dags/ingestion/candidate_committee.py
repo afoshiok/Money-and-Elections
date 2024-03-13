@@ -80,7 +80,7 @@ def candidate_committee_ingestion():
                              dtype={'CAND_ELECTION_YR': 'Int64', 'FEC_ELECTION_YR': 'Int64', 'LINKAGE_ID': 'Int64'}
                              )
         export_path = final_path + f"{run_date}_ccl.csv"
-        ccl_df.to_csv(export_path, sep=",", index=False)
+        ccl_df.to_csv(export_path, sep="|", index=False)
     
     @task
     def upload_to_S3():

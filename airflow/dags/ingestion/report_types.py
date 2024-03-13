@@ -43,7 +43,7 @@ def report_types_ingestion():
         report_types_df = pd.read_html(report_types_page, flavor="lxml", header=0)[0]
 
         report_types_path = final_path + f"{run_date}_report_types.csv"
-        report_types_df.to_csv(report_types_path, sep=",", index=False)
+        report_types_df.to_csv(report_types_path, sep="|", index=False)
 
     @task
     def upload_to_S3():

@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS src_cand_cmte_link (
     cmte_id varchar(9),
     cmte_tp varchar(1),
     cmte_dsgn varchar(1),
-    linkage_id number(12),
+    linkage_id number(12)
 )  

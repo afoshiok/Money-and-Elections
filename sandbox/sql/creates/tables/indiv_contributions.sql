@@ -1,5 +1,4 @@
 CREATE TABLE IF NOT EXISTS src_individual_contributions (
-    sub_id varchar(9),
     cmte_id varchar(9),
     amndt_ind varchar(1),
     rpt_tp varchar(3),
@@ -11,6 +10,7 @@ CREATE TABLE IF NOT EXISTS src_individual_contributions (
     city varchar(30),
     state varchar(2),
     zip_code varchar(9),
+    employer varchar(38),
     occupation varchar(38),
     transaction_dt date,
     transaction_amt number(14,2),
@@ -18,5 +18,6 @@ CREATE TABLE IF NOT EXISTS src_individual_contributions (
     tran_id varchar(32),
     file_num number(22),
     memo_cd varchar(1),
-    memo_text varchar(100)
+    memo_text varchar(100),
+    sub_id varchar(19),
 )

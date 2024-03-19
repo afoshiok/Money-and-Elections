@@ -12,7 +12,7 @@ default_args = {
     "retry_delay": duration(minutes=1),
 }
 
-merge_political_parties = """
+merge_ccl = """
 USE ELECTION.PUBLIC;
 
 MERGE INTO election.raw.src_cand_cmte_link AS target
@@ -56,7 +56,7 @@ def merge_ccl_table():
     def merge_table():
         snowflake_query = SnowflakeOperator(
             task_id="snowflake_query",
-            sql=merge_political_parties,
+            sql=merge_ccl,
             snowflake_conn_id="snowflake_conn"
         )
         snowflake_query.execute(context={})

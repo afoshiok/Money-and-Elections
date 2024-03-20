@@ -24,8 +24,7 @@ USING (
         $3 as "FEC_ELECTION_YR",
         $4 as "CMTE_ID",
         $5 as "CMTE_TP",
-        $6 as "CMTE_DSGN",
-        
+        $6 as "CMTE_DSGN"
     FROM @candidate_committee_stage
 ) AS source
 ON target.linkage_id = source.linkage_id 

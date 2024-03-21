@@ -34,13 +34,14 @@ USING (
         $12 as "EMPLOYER",
         $13 as "OCCUPATION",
         $14 as "TRANSACTION_DT",
-        $15 as "TRANSACTION_AMT",
+        TRY_CAST($15 AS INTEGER) as "TRANSACTION_AMT",
         $16 as "OTHER_ID",
         $17 as "TRAN_ID",
         $18 as "FILE_NUM",
         $19 as "MEMO_CD",
         $20 as "MEMO_TEXT"
   FROM @INDIVIDUAL_CONTRIBUTIONS_STAGE
+  WHERE TRY_CAST($15 AS INTEGER) IS NOT NULL -- Filter out records where TRY_CAST fails
 ) AS source
 ON target.sub_id = source.sub_id
 WHEN MATCHED THEN
@@ -59,7 +60,7 @@ WHEN MATCHED THEN
     target.employer = source.employer,
     target.occupation = source.occupation,
     target.transaction_dt = source.transaction_dt,
-    target.transaction_amt = source.transaction_amt,
+    target.transaction_amt = source.transaction_amt, -- This will now only be integers
     target.other_id = source.other_id,
     target.tran_id = source.tran_id,
     target.file_num = source.file_num,
@@ -70,7 +71,10 @@ WHEN NOT MATCHED THEN
   INSERT (cmte_id, amndt_ind, rpt_tp, transaction_pgi, image_num, transaction_tp, entity_tp,
   name, city, state, zip_code, employer, occupation, transaction_dt, transaction_amt,
   other_id, tran_id, file_num, memo_cd, memo_text, sub_id)
-  VALUES (source.cmte_id, source.amndt_ind, source.rpt_tp, source.transaction_pgi, source.image_num, source.transaction_tp, source.entity_tp, source.name, source.city, source.state, source.zip_code, source.employer, source.occupation, source.transaction_dt, source.transaction_amt, source.other_id, source.tran_id, source.file_num, source.memo_cd, source.memo_text, source.sub_id);
+  VALUES (source.cmte_id, source.amndt_ind, source.rpt_tp, source.transaction_pgi, source.image_num, 
+  source.transaction_tp, source.entity_tp, source.name, source.city, source.state, source.zip_code, source.employer, 
+  source.occupation, source.transaction_dt, source.transaction_amt, source.other_id, source.tran_id, source.file_num, 
+  source.memo_cd, source.memo_text, source.sub_id);
 """
 
 @dag(

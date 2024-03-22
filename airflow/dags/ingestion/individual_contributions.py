@@ -113,7 +113,7 @@ def individual_cont_ingestion():
     def upload_to_S3():
         hook = S3Hook(aws_conn_id='aws_conn')
         local_path = final_path + f"{run_date}_indiv_cont.csv"
-        s3_key = f"s3://fec-data/individual_contributions/polars_{run_date}_indiv_cont.csv" 
+        s3_key = f"s3://fec-data/individual_contributions/{run_date}_indiv_cont.csv" 
         hook.load_file(filename=local_path, key=s3_key)
 
     @task

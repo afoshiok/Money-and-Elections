@@ -8,7 +8,7 @@ import requests
 import os
 import shutil 
 import zipfile
-import pandas as pd
+import polars as pl
 
 default_args = {
     "owner": "admin",
@@ -73,23 +73,47 @@ def individual_cont_ingestion():
         header_file = unzipped_path + f"{run_date}_indiv_cont_headers.csv"
         indiv_cont_file = unzipped_path + "itcont.txt"
 
-        indiv_cont_header = pd.read_csv(header_file)
-        indiv_cont_df = pd.read_csv(indiv_cont_file, sep="|", names=indiv_cont_header.columns)
+        ic_schema = {
+            "CMTE_ID": pl.String,
+            "AMNDT_IND": pl.String,
+            "RPT_TP": pl.String,
+            "TRANSACTION_PGI": pl.String,
+            "IMAGE_NUM": pl.String,
+            "TRANSACTION_TP": pl.String,
+            "ENTITY_TP": pl.String,
+            "NAME": pl.String,
+            "CITY": pl.String,
+            "STATE": pl.String,
+            "ZIP_CODE": pl.String,
+            "EMPLOYER": pl.String,
+            "OCCUPATION": pl.String,
+            "TRANSACTION_DT": pl.String,
+            "TRANSACTION_AMT": pl.Float64,
+            "OTHER_ID": pl.String,
+            "TRAN_ID": pl.String,
+            "FILE_NUM": pl.Int32,
+            "MEMO_CD": pl.String,
+            "MEMO_TEXT": pl.String,
+            "SUB_ID": pl.String
+        }
 
-        try:
-            indiv_cont_df["TRANSACTION_DT"] = pd.to_datetime(indiv_cont_df["TRANSACTION_DT"], format="%m%d%Y", errors='coerce')
-        except ValueError:
-            pass
+        indiv_cont_header = pl.read_csv(source=header_file, has_header=True)
+        indiv_cont_df = pl.read_csv(source=indiv_cont_file, has_header=False, separator="|", new_columns=indiv_cont_header.columns, schema=ic_schema)
+
+        final_df = indiv_cont_df.with_columns(
+            pl.col('TRANSACTION_DT').str.to_date(format='%m%d%Y')
+        )
+
         
         export_path = final_path + f"{run_date}_indiv_cont.csv"
 
-        indiv_cont_df.to_csv(export_path, sep="^", index=False) #Changed delim to be as unqiue as possible to fix MERGE issue in db.
+        final_df.write_csv(export_path, separator="|") #Changed delim to be as unqiue as possible to fix MERGE issue in db.
 
     @task
     def upload_to_S3():
         hook = S3Hook(aws_conn_id='aws_conn')
         local_path = final_path + f"{run_date}_indiv_cont.csv"
-        s3_key = f"s3://fec-data/individual_contributions/{run_date}_indiv_cont.csv" 
+        s3_key = f"s3://fec-data/individual_contributions/polars_{run_date}_indiv_cont.csv" 
         hook.load_file(filename=local_path, key=s3_key)
 
     @task

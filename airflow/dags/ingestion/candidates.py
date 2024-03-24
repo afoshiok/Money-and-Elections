@@ -8,7 +8,7 @@ import requests
 import os
 import shutil 
 import zipfile
-import pandas as pd
+import polars as pl
 
 default_args = {
     "owner": "admin",
@@ -75,12 +75,30 @@ def candidate_ingestion():
         header_file = unzipped_path + f"{run_date}_candidates_header.csv"
         candidate_file = unzipped_path + f"{run_date}_candidates.csv"
 
-        candidate_header = pd.read_csv(header_file)
-        candidate_df = pd.read_csv(candidate_file, sep="|", names=candidate_header.columns, dtype={'CAND_OFFICE_DISTRICT': "Int64", "CAND_ZIP" : "Int64"}) #This fixes the issue where pandas with convert Int columns with NaN to float 
+        candidate_schema = {
+            "CAND_ID": pl.String,
+            "CAND_NAME": pl.String,
+            "CAND_PTY_AFFILIATION": pl.String,
+            "CAND_ELECTION_YR": pl.Int16,
+            "CAND_OFFICE_ST": pl.String,
+            "CAND_OFFICE": pl.String,
+            "CAND_OFFICE_DISTRICT": pl.String,
+            "CAND_ICI": pl.String,
+            "CAND_STATUS": pl.String,
+            "CAND_PCC": pl.String,
+            "CAND_ST1": pl.String,
+            "CAND_ST2": pl.String,
+            "CAND_CITY": pl.String,
+            "CAND_ST": pl.String,
+            "CAND_ZIP": pl.String
+        }
+
+        candidate_header = pl.read_csv(source=header_file, has_header=True)
+        candidate_df = pl.read_csv(source=candidate_file, separator="|", new_columns=candidate_header.columns, schema=candidate_schema)
 
         export_path = final_path + f"{run_date}_candidates.csv"
 
-        candidate_df.to_csv(export_path, sep="|", index=False)
+        candidate_df.write_csv(export_path, separator="|")
 
     @task
     def upload_to_S3():

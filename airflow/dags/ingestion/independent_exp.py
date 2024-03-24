@@ -8,7 +8,7 @@ import requests
 import os
 import shutil 
 import zipfile
-import pandas as pd
+import polars as pl
 
 default_args = {
     "owner": "admin",
@@ -75,28 +75,46 @@ def independent_exp_ingestion():
         header_file = unzipped_path + f"{run_date}_independent_exp_header.csv"
         independent_exp_file = unzipped_path +  f"{run_date}_independent_exp.csv"
 
-        ind_exp_header = pd.read_csv(header_file)
-        ind_exp_df = pd.read_csv(independent_exp_file, 
-                                 sep="|", names=ind_exp_header.columns, 
-                                 dtype={'ZIP_CODE': 'Int64', 
-                                        'TRANSACTION_DT': 'Int64', 
-                                        'TRANSACTION_AMT' : 'Float64'
-                                        }
-                                 )
+        independent_exp_schema = {
+            "CMTE_ID": pl.String,
+            "AMNDT_IND": pl.String,
+            "RPT_TP": pl.String,
+            "TRANSACTION_PGI": pl.String,
+            "IMAGE_NUM": pl.String,
+            "TRANSACTION_TP": pl.String,
+            "ENTITY_TP": pl.String,
+            "NAME": pl.String,
+            "CITY": pl.String,
+            "STATE": pl.String,
+            "ZIP_CODE": pl.String,
+            "EMPLOYER": pl.String,
+            "OCCUPATION": pl.String,
+            "TRANSACTION_DT": pl.String, #Will be converted into a date later on
+            "TRANSACTION_AMT": pl.Float32,
+            "OTHER_ID": pl.String,
+            "CAND_ID":pl.String,
+            "TRAN_ID": pl.String,
+            "FILE_NUM": pl.Int32,
+            "MEMO_CD": pl.String,
+            "MEMO_TEXT": pl.String,
+            "SUB_ID": pl.String
+        }
 
-        try:
-            ind_exp_df["TRANSACTION_DT"] = pd.to_datetime(ind_exp_df["TRANSACTION_DT"], format="%m%d%Y", errors='coerce')
-        except ValueError:
-            pass
+        ind_exp_header = pl.read_csv(source=header_file, has_header=True)
+        ind_exp_df = pl.read_csv(source=independent_exp_file, has_header=False, separator="|", new_columns=ind_exp_header.columns, schema=independent_exp_schema)
+
+        final_df = ind_exp_df.with_columns(
+            pl.col('TRANSACTION_DT').str.to_date(format='%m%d%Y')
+        )
 
         export_path = final_path + f"{run_date}_independent_exp.csv"
-        ind_exp_df.to_csv(export_path, sep="|", index=False)
+        final_df.write_csv(export_path, separator="|")
 
     @task
     def upload_to_S3():
         hook = S3Hook(aws_conn_id='aws_conn')
         local_path = final_path + f"{run_date}_independent_exp.csv"
-        hook.load_file(filename=local_path, key=f"s3://fec-data/independent_expenditures/{run_date}_independent_exp.csv")
+        hook.load_file(filename=local_path, key=f"s3://fec-data/independent_expenditures/polars_{run_date}_independent_exp.csv")
 
     @task
     def clean_up():

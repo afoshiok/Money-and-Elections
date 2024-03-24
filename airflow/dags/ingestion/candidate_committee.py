@@ -8,7 +8,7 @@ import requests
 import os
 import shutil 
 import zipfile
-import pandas as pd
+import polars as pl
 
 default_args = {
     "owner": "admin",
@@ -74,13 +74,22 @@ def candidate_committee_ingestion():
         header_file =  unzipped_path + f"{run_date}_ccl_header.csv"
         candidate_committe_file = unzipped_path + f"{run_date}_ccl.csv"
 
-        ccl_header = pd.read_csv(header_file)
-        ccl_df = pd.read_csv(candidate_committe_file, sep="|", 
-                             names=ccl_header.columns, 
-                             dtype={'CAND_ELECTION_YR': 'Int64', 'FEC_ELECTION_YR': 'Int64', 'LINKAGE_ID': 'Int64'}
-                             )
+        ccl_schema = {
+            "CAND_ID": pl.String,
+            "CAND_ELECTION_YR": pl.Int32,
+            "FEC_ELECTION_YR": pl.Int32,
+            "CMTE_ID": pl.String,
+            "CMTE_TP": pl.String,
+            "CMTE_DSGN": pl.String,
+            "LINKAGE_ID": pl.Int32
+        }
+
+        ccl_header = pl.read_csv(source=header_file, has_header=True)
+        ccl_df = pl.read_csv(source=candidate_committe_file, separator="|", new_columns=ccl_header.columns, schema=ccl_schema)
+
+
         export_path = final_path + f"{run_date}_ccl.csv"
-        ccl_df.to_csv(export_path, sep="|", index=False)
+        ccl_df.write_csv(export_path, separator="|")
     
     @task
     def upload_to_S3():

@@ -8,7 +8,7 @@ import requests
 import os
 import shutil 
 import zipfile
-import pandas as pd
+import polars as pl
 
 default_args = {
     "owner": "admin",
@@ -76,21 +76,58 @@ def operating_exp_ingestion():
         header_file = unzipped_path + f"{run_date}_operating_exp_header.csv"
         operating_exp_file = unzipped_path + f"{run_date}_operating_exp.csv"
 
-        operating_exp_header = pd.read_csv(header_file)
+        operating_exp_schema = {
+            'CMTE_ID': pl.String,
+            'AMNDT_IND': pl.String,
+            'RPT_YR': pl.Int16,
+            'RPT_TP': pl.String,
+            'IMAGE_NUM': pl.String,
+            'LINE_NUM': pl.String,
+            'FORM_TP_CD': pl.String,
+            'SCHED_TP_CD': pl.String,
+            'NAME': pl.String,
+            'CITY': pl.String,
+            'STATE': pl.String,
+            'ZIP_CODE': pl.String,
+            'TRANSACTION_DT': pl.String,
+            'TRANSACTION_AMT': pl.Float32,
+            'TRANSACTION_PGI': pl.String,
+            'PURPOSE': pl.String,
+            'CATEGORY': pl.String,
+            'CATEGORY_DESC': pl.String,
+            'MEMO_CD': pl.String,
+            'MEMO_TEXT': pl.String,
+            'ENTITY_TP': pl.String,
+            'SUB_ID': pl.Int64,
+            'FILE_NUM': pl.Int64,
+            'TRAN_ID': pl.String,
+            'BACK_REF_TRAN_ID': pl.String
+        }
 
-        columns = operating_exp_header.columns.tolist()
-        operating_exp_df = pd.read_csv(operating_exp_file, sep="|", header=None, dtype={16: "object"}) #Won't add a header yet, need to drop an extra column.
-        operating_exp_df = operating_exp_df.drop(operating_exp_df.columns[-1], axis=1) #Removing the extra column Pandas added
-        operating_exp_df = operating_exp_df.set_axis(columns, axis=1)
+        operating_exp_header = pl.read_csv(source=header_file, has_header=True)
+
+        operating_exp_df = pl.read_csv(source=operating_exp_file, separator="|", ignore_errors=True, has_header=False) #Won't add a header yet, need to drop an extra column.
+        operating_exp_df = operating_exp_df.drop(operating_exp_df.columns[-1]) #Dropping the extra column added to this df
+        current_columns = operating_exp_df.columns #List of current column names ("column_1", "column_2", etc.)
+        new_columns = operating_exp_header.columns
+
+        column_rename = dict(zip(current_columns,new_columns)) #Creating a dict of old:new names
+        operating_exp_df = operating_exp_df.rename(column_rename) #Equivalent to set_axis in Pandas
+
+        operating_exp_df = operating_exp_df.cast(operating_exp_schema)# Finally adding the schema to the df
+
+        final_df = operating_exp_df.with_columns(
+            pl.col('TRANSACTION_DT').str.to_date(format='%m/%d/%Y')
+        )
         
         export_path = final_path + f"{run_date}_operating_exp.csv"
-        operating_exp_df.to_csv(export_path, sep="|", index=False)
+        final_df.write_csv(export_path, separator="|")
 
     @task
     def upload_to_S3():
         hook = S3Hook(aws_conn_id = 'aws_conn')
         local_path = final_path + f"{run_date}_operating_exp.csv"
-        hook.load_file(filename=local_path, key=f"s3://fec-data/operating_expenditures/{run_date}_operating_exp.csv")
+        hook.load_file(filename=local_path, key=f"s3://fec-data/operating_expenditures/polars_{run_date}_operating_exp.csv")
 
     @task
     def clean_up():

@@ -8,7 +8,7 @@ import requests
 import os
 import shutil 
 import zipfile
-import pandas as pd
+import polars as pl
 
 default_args = {
     "owner": "admin",
@@ -80,18 +80,36 @@ def committee_ingestion():
     def process_data():
         header_file = unzipped_path + f"{run_date}_committees_headers.csv"
         committee_file = unzipped_path + f"{run_date}_cm24/" + "cm.txt"
+
+        committees_schema = {
+            'CMTE_ID': pl.String,
+            'CMTE_NM': pl.String,
+            'TRESNAM': pl.String,
+            'CMTE_ST1': pl.String,
+            'CMTE_ST2': pl.String,
+            'CMTE_CITY': pl.String,
+            'CMTE_ST': pl.String,
+            'CMTE_ZIP': pl.String,
+            'CMTE_DSGN': pl.String,
+            'CMTE_TP': pl.String,
+            'CMTE_PTY_AFFILIATION': pl.String,
+            'CMTE_FILING_FREQ': pl.String,
+            'ORG_TP': pl.String,
+            'CONNECTED_ORG_NM': pl.String,
+            'CAND_ID': pl.String
+        }
         #Adding headers to Committe data
-        committee_header = pd.read_csv(header_file)
-        committee_df = pd.read_csv(committee_file, sep="|", names=committee_header.columns)
+        committee_header = pl.read_csv(source=header_file, has_header=True)
+        committee_df = pl.read_csv(source=committee_file, has_header=False, separator="|", new_columns=committee_header.columns, schema=committees_schema)
         export_path = final_path + f"{run_date}_cm24.csv"
 
-        committee_df.to_csv(export_path, sep="|", index=False)
+        committee_df.write_csv(export_path, separator="|")
 
     @task
     def upload_to_S3():
         hook = S3Hook(aws_conn_id='aws_conn')
         local_path = final_path + f"{run_date}_cm24.csv"
-        hook.load_file(filename=local_path, key=f"s3://fec-data/committees/{run_date}_committees.csv")
+        hook.load_file(filename=local_path, key=f"s3://fec-data/committees/polars_{run_date}_committees.csv")
 
     @task
     def end():

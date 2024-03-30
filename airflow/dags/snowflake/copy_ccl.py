@@ -16,7 +16,7 @@ USE ELECTION.RAW;
 
 TRUNCATE TABLE election.raw.src_cand_cmte_link;
 """
-merge_ccl = """
+copy_ccl = """
 USE ELECTION.PUBLIC;
 
 COPY INTO election.raw.src_cand_cmte_link
@@ -45,10 +45,10 @@ def copy_ccl_table():
         snowflake_query.execute(context={})
 
     @task
-    def merge_table():
+    def copy_table():
         snowflake_query = SnowflakeOperator(
             task_id="snowflake_query",
-            sql=merge_ccl,
+            sql=copy_ccl,
             snowflake_conn_id="snowflake_conn"
         )
         snowflake_query.execute(context={})
@@ -57,6 +57,6 @@ def copy_ccl_table():
     def end():
         EmptyOperator(task_id="end")
 
-    begin() >> truncate_table() >> merge_table() >> end()
+    begin() >> truncate_table() >> copy_table() >> end()
 
 copy_ccl_table()

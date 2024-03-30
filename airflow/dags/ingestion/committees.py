@@ -109,7 +109,7 @@ def committee_ingestion():
     def upload_to_S3():
         hook = S3Hook(aws_conn_id='aws_conn')
         local_path = final_path + f"{run_date}_cm24.csv"
-        hook.load_file(filename=local_path, key=f"s3://fec-data/committees/polars_{run_date}_committees.csv")
+        hook.load_file(filename=local_path, key=f"s3://fec-data/committees/{run_date}_committees.csv")
 
     @task
     def end():

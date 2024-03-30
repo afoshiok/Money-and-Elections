@@ -8,7 +8,7 @@ import requests
 import os
 import shutil 
 import zipfile
-import pandas as pd
+import polars as pl
 
 default_args = {
     "owner": "admin",
@@ -76,17 +76,39 @@ def committee_transactions_ingestion():
         header_file = unzipped_path + f"{run_date}_committee_trans_header.csv"
         transaction_file = unzipped_path + f"{run_date}_committee_transactions.csv"
 
-        headers = pd.read_csv(header_file)
-        columns = headers.columns.to_list()
-        committee_trans_df = pd.read_csv(transaction_file, sep="|", names=columns, dtype={"TRANSACTION_DT": "object", "ZIP_CODE": "object" })
+        committee_trans_schema = {
+            'CMTE_ID': pl.String,
+            'AMNDT_IND': pl.String,
+            'RPT_TP': pl.String,
+            'TRANSACTION_PGI': pl.String,
+            'IMAGE_NUM': pl.String,
+            'TRANSACTION_TP': pl.String,
+            'ENTITY_TP': pl.String,
+            'NAME': pl.String,
+            'CITY': pl.String,
+            'STATE': pl.String,
+            'ZIP_CODE': pl.String,
+            'EMPLOYER': pl.String,
+            'OCCUPATION': pl.String,
+            'TRANSACTION_DT': pl.String, #Will be converted into a date later on
+            'TRANSACTION_AMT': pl.Float32,
+            'OTHER_ID': pl.String,
+            'TRAN_ID': pl.String,
+            'FILE_NUM': pl.String,
+            'MEMO_CD': pl.String,
+            'MEMO_TEXT': pl.String,
+            'SUB_ID': pl.String #Suppose to be a Int but, parsing as a String is easier.
+        }
 
-        try:
-            committee_trans_df["TRANSACTION_DT"] = pd.to_datetime(committee_trans_df["TRANSACTION_DT"], format="%m%d%Y", errors='coerce')
-        except ValueError:
-            pass
+        headers = pl.read_csv(source=header_file, has_header=True)
+        committee_trans_df = pl.read_csv(source=transaction_file, has_header=False, separator="|", new_columns=headers.columns, schema=committee_trans_schema)
+
+        final_df = committee_trans_df.with_columns(
+            pl.col('TRANSACTION_DT').str.to_date(format='%m%d%Y')
+        )
 
         export_path = final_path + f"{run_date}_committee_transactions.csv"
-        committee_trans_df.to_csv(export_path, sep="|", index=False)
+        final_df.write_csv(export_path, separator="|")
     
     @task
     def upload_to_S3():

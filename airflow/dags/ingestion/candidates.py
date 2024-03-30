@@ -96,15 +96,15 @@ def candidate_ingestion():
         candidate_header = pl.read_csv(source=header_file, has_header=True)
         candidate_df = pl.read_csv(source=candidate_file, separator="|", new_columns=candidate_header.columns, schema=candidate_schema)
 
-        export_path = final_path + f"{run_date}_candidates.csv"
+        export_path = final_path + f"{run_date}_candidates.parquet"
 
-        candidate_df.write_csv(export_path, separator="|")
+        candidate_df.write_parquet(export_path)
 
     @task
     def upload_to_S3():
         hook = S3Hook(aws_conn_id='aws_conn')
-        local_path = final_path + f"{run_date}_candidates.csv"
-        hook.load_file(filename=local_path, key=f"s3://fec-data/candidates/{run_date}_candidates.csv")
+        local_path = final_path + f"{run_date}_candidates.parquet"
+        hook.load_file(filename=local_path, key=f"s3://fec-data/candidates/{run_date}_candidates.parquet")
     
     @task
     def clean_up():

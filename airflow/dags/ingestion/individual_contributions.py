@@ -105,15 +105,15 @@ def individual_cont_ingestion():
         )
 
         
-        export_path = final_path + f"{run_date}_indiv_cont.csv"
+        export_path = final_path + f"{run_date}_indiv_cont.parquet"
 
-        final_df.write_csv(export_path, separator="|") #Changed delim to be as unqiue as possible to fix MERGE issue in db.
+        final_df.write_parquet(export_path) #Changed delim to be as unqiue as possible to fix MERGE issue in db.
 
     @task
     def upload_to_S3():
         hook = S3Hook(aws_conn_id='aws_conn')
-        local_path = final_path + f"{run_date}_indiv_cont.csv"
-        s3_key = f"s3://fec-data/individual_contributions/{run_date}_indiv_cont.csv" 
+        local_path = final_path + f"{run_date}_indiv_cont.parquet"
+        s3_key = f"s3://fec-data/individual_contributions/{run_date}_indiv_cont.parquet" 
         hook.load_file(filename=local_path, key=s3_key)
 
     @task

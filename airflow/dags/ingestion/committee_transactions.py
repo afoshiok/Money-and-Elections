@@ -107,14 +107,14 @@ def committee_transactions_ingestion():
             pl.col('TRANSACTION_DT').str.to_date(format='%m%d%Y')
         )
 
-        export_path = final_path + f"{run_date}_committee_transactions.csv"
-        final_df.write_csv(export_path, separator="|")
+        export_path = final_path + f"{run_date}_committee_transactions.parquet"
+        final_df.write_parquet(export_path)
     
     @task
     def upload_to_S3():
         hook = S3Hook(aws_conn_id = 'aws_conn')
-        local_path = final_path + f"{run_date}_committee_transactions.csv"
-        hook.load_file(filename=local_path, key=f"s3://fec-data/committee_transactions/{run_date}_committee_transactions.csv")
+        local_path = final_path + f"{run_date}_committee_transactions.parquet"
+        hook.load_file(filename=local_path, key=f"s3://fec-data/committee_transactions/{run_date}_committee_transactions.parquet")
 
     @task
     def clean_up():

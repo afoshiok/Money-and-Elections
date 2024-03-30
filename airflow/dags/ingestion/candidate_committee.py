@@ -88,14 +88,14 @@ def candidate_committee_ingestion():
         ccl_df = pl.read_csv(source=candidate_committe_file, separator="|", new_columns=ccl_header.columns, schema=ccl_schema)
 
 
-        export_path = final_path + f"{run_date}_ccl.csv"
-        ccl_df.write_csv(export_path, separator="|")
+        export_path = final_path + f"{run_date}_ccl.parquet"
+        ccl_df.write_parquet(export_path)
     
     @task
     def upload_to_S3():
         hook = S3Hook(aws_conn_id="aws_conn")
-        local_path = final_path + f"{run_date}_ccl.csv"
-        hook.load_file(filename=local_path, key=f"s3://fec-data/candidate-committee_link/{run_date}_ccl.csv")
+        local_path = final_path + f"{run_date}_ccl.parquet"
+        hook.load_file(filename=local_path, key=f"s3://fec-data/candidate-committee_link/{run_date}_ccl.parquet")
 
     @task
     def clean_up():

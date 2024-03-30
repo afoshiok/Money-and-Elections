@@ -101,15 +101,15 @@ def committee_ingestion():
         #Adding headers to Committe data
         committee_header = pl.read_csv(source=header_file, has_header=True)
         committee_df = pl.read_csv(source=committee_file, has_header=False, separator="|", new_columns=committee_header.columns, schema=committees_schema)
-        export_path = final_path + f"{run_date}_cm24.csv"
+        export_path = final_path + f"{run_date}_cm24.parquet"
 
-        committee_df.write_csv(export_path, separator="|")
+        committee_df.write_parquet(export_path)
 
     @task
     def upload_to_S3():
         hook = S3Hook(aws_conn_id='aws_conn')
-        local_path = final_path + f"{run_date}_cm24.csv"
-        hook.load_file(filename=local_path, key=f"s3://fec-data/committees/{run_date}_committees.csv")
+        local_path = final_path + f"{run_date}_cm24.parquet"
+        hook.load_file(filename=local_path, key=f"s3://fec-data/committees/{run_date}_committees.parquet")
 
     @task
     def end():

@@ -107,14 +107,14 @@ def independent_exp_ingestion():
             pl.col('TRANSACTION_DT').str.to_date(format='%m%d%Y')
         )
 
-        export_path = final_path + f"{run_date}_independent_exp.csv"
-        final_df.write_csv(export_path, separator="|")
+        export_path = final_path + f"{run_date}_independent_exp.parquet"
+        final_df.write_parquet(export_path)
 
     @task
     def upload_to_S3():
         hook = S3Hook(aws_conn_id='aws_conn')
-        local_path = final_path + f"{run_date}_independent_exp.csv"
-        hook.load_file(filename=local_path, key=f"s3://fec-data/independent_expenditures/{run_date}_independent_exp.csv")
+        local_path = final_path + f"{run_date}_independent_exp.parquet"
+        hook.load_file(filename=local_path, key=f"s3://fec-data/independent_expenditures/{run_date}_independent_exp.parquet")
 
     @task
     def clean_up():

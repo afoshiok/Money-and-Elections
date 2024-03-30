@@ -12,17 +12,17 @@ default_args = {
     "retry_delay": duration(minutes=1),
 }
 
-truncate_operating_exp = """
+truncate_committees = """
 USE ELECTION.RAW;
 
-TRUNCATE TABLE election.raw.src_operating_expenditures;
+TRUNCATE TABLE election.raw.src_committees;
 """
 
-copy_operating_exp = """
+copy_committees = """
 USE ELECTION.PUBLIC;
 
-COPY INTO election.raw.src_operating_expenditures
-FROM @OPERATING_EXPENDITURES_STAGE
+COPY INTO election.raw.src_committees
+FROM @COMMITTEE_STAGE/2024-03-30_committees.parquet
 ON_ERROR = 'SKIP_FILE_5%'
 FILE_FORMAT = (TYPE = PARQUET)
 MATCH_BY_COLUMN_NAME = CASE_SENSITIVE;
@@ -31,7 +31,7 @@ MATCH_BY_COLUMN_NAME = CASE_SENSITIVE;
 @dag(
     start_date=datetime(2024, 1, 1), schedule=None, default_args=default_args
 )
-def copy_operating_expenditures():
+def copy_committees_table():
     @task
     def begin():
         EmptyOperator(task_id="begin")
@@ -40,7 +40,7 @@ def copy_operating_expenditures():
     def truncate_table():
         snowflake_query = SnowflakeOperator(
             task_id="snowflake_query",
-            sql=truncate_operating_exp,
+            sql=truncate_committees,
             snowflake_conn_id="snowflake_conn"
         )
         snowflake_query.execute(context={})
@@ -49,7 +49,7 @@ def copy_operating_expenditures():
     def copy_table():
         snowflake_query = SnowflakeOperator(
             task_id="snowflake_query",
-            sql=copy_operating_exp,
+            sql=copy_committees,
             snowflake_conn_id="snowflake_conn"
         )
         snowflake_query.execute(context={})
@@ -59,4 +59,4 @@ def copy_operating_expenditures():
         EmptyOperator(task_id="end")
 
     begin() >> truncate_table() >> copy_table() >> end()
-copy_operating_expenditures()
+copy_committees_table()

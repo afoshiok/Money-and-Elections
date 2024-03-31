@@ -161,6 +161,5 @@ cython_debug/
 
 #Files that are too large (will be in S3)
 *.csv
-*.txt
 *zip
 *.parquet

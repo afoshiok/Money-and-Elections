@@ -33,7 +33,7 @@ fi
 
 export COMPOSE_FILE="${PROJECT_DIR}/docker-compose.yaml"
 if [ $# -gt 0 ]; then
-    exec $dc run --rm airflow-cli "${@}"
+    exec $dc run -u airflow --rm airflow-cli "${@}"
 else
     exec $dc run --rm airflow-cli
 fi

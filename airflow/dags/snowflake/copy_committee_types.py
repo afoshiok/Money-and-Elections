@@ -15,13 +15,13 @@ default_args = {
 truncate_committee_types = """
 USE ELECTION.RAW;
 
-TRUNCATE TABLE election.raw.SRC_COMMITTEE_TYPES;
+TRUNCATE TABLE election.raw.RAW_COMMITTEE_TYPES;
 """
 
 copy_committee_types = """
 USE ELECTION.PUBLIC;
 
-COPY INTO election.raw.SRC_COMMITTEE_TYPES
+COPY INTO election.raw.RAW_COMMITTEE_TYPES
 FROM @COMMITTEE_TYPES_STAGE
 ON_ERROR = 'SKIP_FILE_5%'
 FILE_FORMAT = FEC_CSV;

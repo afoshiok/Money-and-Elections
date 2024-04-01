@@ -15,13 +15,13 @@ default_args = {
 truncate_candidates = """
 USE ELECTION.RAW;
 
-TRUNCATE TABLE election.raw.src_candidates;
+TRUNCATE TABLE election.raw.raw_candidates;
 """
 
 copy_candidates = """
 USE ELECTION.PUBLIC;
 
-COPY INTO election.raw.src_candidates
+COPY INTO election.raw.raw_candidates
 FROM @CANDIDATE_STAGE
 FILE_FORMAT = (TYPE = PARQUET)
 ON_ERROR = 'SKIP_FILE_5%'

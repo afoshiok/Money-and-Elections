@@ -15,13 +15,13 @@ default_args = {
 truncate_committee_trans = """
 USE ELECTION.RAW;
 
-TRUNCATE TABLE election.raw.src_committee_transactions;
+TRUNCATE TABLE election.raw.raw_committee_transactions;
 """
 
 copy_committee_trans = """
 USE ELECTION.PUBLIC;
 
-COPY INTO election.raw.src_committee_transactions
+COPY INTO election.raw.raw_committee_transactions
 FROM @COMMITTEE_TRANSACTIONS_STAGE
 ON_ERROR = 'SKIP_FILE_5%'
 FILE_FORMAT = (TYPE = PARQUET)

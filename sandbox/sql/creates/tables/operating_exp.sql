@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS src_operating_expenditures (
+CREATE TABLE IF NOT EXISTS raw_operating_expenditures (
     cmte_id varchar(9),
     amndt_ind varchar(1),
     rpt_yr number(4),

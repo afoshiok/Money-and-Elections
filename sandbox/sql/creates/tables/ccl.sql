@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS src_cand_cmte_link (
+CREATE TABLE IF NOT EXISTS raw_cand_cmte_link (
     cand_id varchar(9),
     cand_election_yr number(4),
     fec_election_yr number(4),

@@ -15,13 +15,13 @@ default_args = {
 truncate_operating_exp = """
 USE ELECTION.RAW;
 
-TRUNCATE TABLE election.raw.src_operating_expenditures;
+TRUNCATE TABLE election.raw.raw_operating_expenditures;
 """
 
 copy_operating_exp = """
 USE ELECTION.PUBLIC;
 
-COPY INTO election.raw.src_operating_expenditures
+COPY INTO election.raw.raw_operating_expenditures
 FROM @OPERATING_EXPENDITURES_STAGE
 ON_ERROR = 'SKIP_FILE_5%'
 FILE_FORMAT = (TYPE = PARQUET)

@@ -15,13 +15,13 @@ default_args = {
 truncate_political_parties = """
 USE ELECTION.RAW;
 
-TRUNCATE TABLE election.raw.SRC_POLITICAL_PARTIES;
+TRUNCATE TABLE election.raw.RAW_POLITICAL_PARTIES;
 """
 
 copy_political_parties = """
 USE ELECTION.PUBLIC;
 
-COPY INTO election.raw.src_political_parties
+COPY INTO election.raw.raw_political_parties
 FROM @POLITICAL_PARTIES_STAGE
 ON_ERROR = 'SKIP_FILE_5%'
 FILE_FORMAT = FEC_CSV;

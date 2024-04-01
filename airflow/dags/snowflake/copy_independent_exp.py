@@ -15,13 +15,13 @@ default_args = {
 truncate_independent_exp = """
 USE ELECTION.RAW;
 
-TRUNCATE TABLE election.raw.src_independent_expenditures;
+TRUNCATE TABLE election.raw.raw_independent_expenditures;
 """
 
 copy_independent_exp = """
 USE ELECTION.PUBLIC;
 
-COPY INTO election.raw.src_independent_expenditures
+COPY INTO election.raw.raw_independent_expenditures
 FROM @INDEPENDENT_EXPENDITURES_STAGE
 ON_ERROR = 'SKIP_FILE_5%'
 FILE_FORMAT = (TYPE = PARQUET)

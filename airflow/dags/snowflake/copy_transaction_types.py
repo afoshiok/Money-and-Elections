@@ -15,13 +15,13 @@ default_args = {
 truncate_transaction_types = """
 USE ELECTION.RAW;
 
-TRUNCATE TABLE election.raw.SRC_TRANSACTION_TYPES;
+TRUNCATE TABLE election.raw.RAW_TRANSACTION_TYPES;
 """
 
 copy_transaction_types = """
 USE ELECTION.PUBLIC;
 
-COPY INTO election.raw.SRC_TRANSACTION_TYPES
+COPY INTO election.raw.RAW_TRANSACTION_TYPES
 FROM @TRANSACTION_TYPES_STAGE
 ON_ERROR = 'SKIP_FILE_5%'
 FILE_FORMAT = FEC_CSV;

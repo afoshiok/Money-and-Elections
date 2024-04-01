@@ -15,13 +15,13 @@ default_args = {
 truncate_committees = """
 USE ELECTION.RAW;
 
-TRUNCATE TABLE election.raw.src_committees;
+TRUNCATE TABLE election.raw.raw_committees;
 """
 
 copy_committees = """
 USE ELECTION.PUBLIC;
 
-COPY INTO election.raw.src_committees
+COPY INTO election.raw.raw_committees
 FROM @COMMITTEE_STAGE/2024-03-30_committees.parquet
 ON_ERROR = 'SKIP_FILE_5%'
 FILE_FORMAT = (TYPE = PARQUET)

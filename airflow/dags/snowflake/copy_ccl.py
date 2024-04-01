@@ -14,12 +14,12 @@ default_args = {
 truncate_ccl = """
 USE ELECTION.RAW;
 
-TRUNCATE TABLE election.raw.src_cand_cmte_link;
+TRUNCATE TABLE election.raw.raw_cand_cmte_link;
 """
 copy_ccl = """
 USE ELECTION.PUBLIC;
 
-COPY INTO election.raw.src_cand_cmte_link
+COPY INTO election.raw.raw_cand_cmte_link
 FROM @CANDIDATE_COMMITTEE_STAGE
 FILE_FORMAT = (TYPE = PARQUET)
 ON_ERROR = 'SKIP_FILE_5%'

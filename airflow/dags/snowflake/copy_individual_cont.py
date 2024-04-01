@@ -15,13 +15,13 @@ default_args = {
 truncate_indiv_cont = """
 USE ELECTION.RAW;
 
-TRUNCATE TABLE election.raw.src_individual_contributions;
+TRUNCATE TABLE election.raw.raw_individual_contributions;
 """
 
 merge_individual_cont = """
 USE ELECTION.PUBLIC;
 
-COPY INTO election.raw.src_individual_contributions
+COPY INTO election.raw.raw_individual_contributions
 FROM @INDIVIDUAL_CONTRIBUTIONS_STAGE
 FILE_FORMAT = (TYPE = PARQUET)
 ON_ERROR = 'SKIP_FILE_5%'

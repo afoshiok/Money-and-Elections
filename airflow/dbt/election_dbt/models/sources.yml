@@ -1,0 +1,22 @@
+version: 1
+
+sources:
+    - name: election
+      schema: raw
+      tables:
+        - name: candidates
+          identifier: raw_candidates
+        - name: committees
+          identifier: raw_committees
+        - name: transaction_types
+          identifier: raw_transaction_types
+        - name: committee_types
+          identifier: raw_committee_types
+        - name: political_parties
+          identifier: raw_political_parties
+        - name: indiv_contributions
+          identifier: raw_individual_contributions
+        - name: report_types
+          identifier: raw_report_types
+        
+          

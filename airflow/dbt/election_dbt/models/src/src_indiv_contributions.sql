@@ -20,15 +20,16 @@ SELECT
     rt.rp_typ,
     ic.transaction_pgi,
     tt.trans_tp_desc,
+    ic.entity_tp,
     ic.name,
     ic.city,
+    ic.state,
     ic.zip_code,
     ic.employer,
     ic.occupation,
     ic.transaction_dt,
     ic.transaction_amt,
-    ic.tran_id,
-    ic.sub_id
+    ic.sub_id --Unique ID
 FROM ic_source ic
 INNER JOIN report_typ_source rt ON ic.rpt_tp = rt.rp_typ_code
 INNER JOIN transaction_typ_source tt ON ic.transaction_tp = tt.trans_tp

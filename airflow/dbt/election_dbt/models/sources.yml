@@ -18,5 +18,7 @@ sources:
           identifier: raw_individual_contributions
         - name: report_types
           identifier: raw_report_types
+        - name: committee_trans
+          identifier: raw_committee_transactions
         
           

@@ -20,5 +20,9 @@ sources:
           identifier: raw_report_types
         - name: committee_trans
           identifier: raw_committee_transactions
+        - name: operating_exp
+          identifier: raw_operating_expenditures
+        - name: independent_exp
+          identifier: raw_independent_expenditures
         
           

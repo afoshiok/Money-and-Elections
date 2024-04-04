@@ -24,5 +24,7 @@ sources:
           identifier: raw_operating_expenditures
         - name: independent_exp
           identifier: raw_independent_expenditures
+        - name: cand_cmte_link
+          identifier: raw_cand_cmte_link
         
           

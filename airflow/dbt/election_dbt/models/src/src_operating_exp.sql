@@ -20,6 +20,7 @@ SELECT
     oes.city,
     oes.state,
     oes.zip_code,
+    oes.transaction_amt,
     oes.transaction_dt,
     oes.purpose,
     oes.category_desc,

@@ -39,4 +39,4 @@ SELECT
     c.cand_id
 FROM committees_source c
 INNER JOIN committee_types_source ct ON c.cmte_tp = ct.cmte_typ_code
-INNER JOIN pp_source p ON c.cmte_pty_affiliation = p.party_code
+LEFT JOIN pp_source p ON c.cmte_pty_affiliation = p.party_code

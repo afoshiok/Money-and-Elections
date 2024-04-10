@@ -16,7 +16,11 @@ SELECT
         THEN cand_office_st || cand_office_district
         ELSE cand_office_district
     END as cand_office_district,
-    s.cand_ici,
+    CASE 
+        WHEN s.cand_ici = 'I' THEN 'Incumbent'
+        WHEN s.cand_ici = 'C' THEN 'Challenger'
+        WHEN s.cand_ici = 'O' THEN 'Open Seat'
+    END as cand_ici,
     s.cand_status,
     s.cand_city,
     s.cand_st

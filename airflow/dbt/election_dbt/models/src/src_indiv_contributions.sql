@@ -24,7 +24,7 @@ SELECT
     ic.name,
     ic.city,
     ic.state,
-    ic.zip_code,
+    LEFT(ic.zip_code, 5) as zip_code, --Formats to only return the first 5 digits of zipcode 
     ic.employer,
     ic.occupation,
     ic.transaction_dt,

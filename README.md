@@ -6,3 +6,26 @@ Election year has finally rolled back around. You know what that means? Millions
 
 ## Project Diagram (Click to make readable)
 ![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/77615769-dd93-4149-a74e-df885caf6d81)
+
+## Data Stack
+**Data Orchestration:**
+- Apache Airflow
+
+**Data Processing:**
+- Polars
+- Pandas
+
+**Data Warehouse and Staging:**
+- AWS S3
+- Snowflake
+
+**Data Transformations:**
+- DBT (Data Build Tool)
+
+**Data Visualization / BI:**
+- Metabase
+
+**Other:**
+- AWS IAM (Access Management for AWS)
+- Notion (Project management / Documentation)
+- Docker (App containerization)

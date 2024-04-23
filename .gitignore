@@ -163,3 +163,5 @@ cython_debug/
 *zip
 *.parquet
 sandbox/
+*.db
+*.jar

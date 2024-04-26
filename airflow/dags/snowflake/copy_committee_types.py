@@ -2,6 +2,8 @@ from airflow.decorators import dag, task
 from airflow.operators.empty import EmptyOperator
 from pendulum import datetime, duration 
 from airflow.providers.snowflake.operators.snowflake import SnowflakeOperator
+from airflow.models.param import Param
+from airflow.operators.bash_operator import BashOperator
 
 default_args = {
     "owner": "admin",
@@ -12,23 +14,8 @@ default_args = {
     "retry_delay": duration(minutes=1),
 }
 
-truncate_committee_types = """
-USE ELECTION.RAW;
-
-TRUNCATE TABLE election.raw.RAW_COMMITTEE_TYPES;
-"""
-
-copy_committee_types = """
-USE ELECTION.PUBLIC;
-
-COPY INTO election.raw.RAW_COMMITTEE_TYPES
-FROM @COMMITTEE_TYPES_STAGE
-ON_ERROR = 'SKIP_FILE_5%'
-FILE_FORMAT = FEC_CSV;
-"""
-
 @dag(
-    start_date=datetime(2024, 1, 1), schedule=None, default_args=default_args
+    start_date=datetime(2024, 1, 1), schedule=None, default_args=default_args, params={ "run_date": Param("2024-03-30", type="string") }
 )
 def copy_committee_types_table():
     @task
@@ -37,6 +24,11 @@ def copy_committee_types_table():
 
     @task
     def truncate_table():
+        truncate_committee_types = """
+        USE ELECTION.RAW;
+
+        TRUNCATE TABLE election.raw.RAW_COMMITTEE_TYPES;
+        """
         snowflake_query = SnowflakeOperator(
             task_id="snowflake_query",
             sql=truncate_committee_types,
@@ -45,7 +37,16 @@ def copy_committee_types_table():
         snowflake_query.execute(context={})
 
     @task
-    def copy_table():
+    def copy_table(params):
+        run_date = params["run_date"]
+        copy_committee_types = f"""
+        USE ELECTION.PUBLIC;
+
+        COPY INTO election.raw.RAW_COMMITTEE_TYPES
+        FROM @COMMITTEE_TYPES_STAGE/{run_date}_committee_types.csv
+        ON_ERROR = 'SKIP_FILE_5%'
+        FILE_FORMAT = FEC_CSV;
+        """
         snowflake_query = SnowflakeOperator(
             task_id="snowflake_query",
             sql=copy_committee_types,

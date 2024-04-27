@@ -1,6 +1,7 @@
 from airflow.decorators import dag, task
 from airflow.operators.empty import EmptyOperator
 from airflow.hooks.S3_hook import S3Hook
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
 import pendulum
 from pendulum import datetime, duration 
@@ -56,9 +57,16 @@ def report_types_ingestion():
         shutil.rmtree(final_path)
         shutil.rmtree("./file_store/report_types/")
 
+    trigger_snowflake_copy = TriggerDagRunOperator(
+        task_id="trigger_snowflake_copy",
+        trigger_dag_id="copy_report_types_table",
+        conf= {"run_date": run_date},
+        wait_for_completion= True
+    )   
+
     @task
     def end():
         EmptyOperator(task_id="end")
 
-    begin() >> create_staging_folders() >> scrape_data() >> upload_to_S3() >> clean_up() >> end()
+    begin() >> create_staging_folders() >> scrape_data() >> upload_to_S3() >> clean_up() >> trigger_snowflake_copy >> end()
 report_types_ingestion()

@@ -3,7 +3,6 @@ from airflow.operators.empty import EmptyOperator
 from pendulum import datetime, duration 
 from airflow.providers.snowflake.operators.snowflake import SnowflakeOperator
 from airflow.models.param import Param
-from airflow.operators.bash_operator import BashOperator
 
 default_args = {
     "owner": "admin",
@@ -55,21 +54,11 @@ def copy_candidates_table():
             snowflake_conn_id="snowflake_conn"
         )
         snowflake_query.execute(context={})
-
-    dbt_test = BashOperator(  ##FIX ME
-        task_id="dbt_test",
-        bash_command= """
-        export DBT_PROFILES_DIR=/home/airflow/.dbt
-        echo $DBT_PROFILES_DIR
-        cd /opt/airflow/dbt/election_dbt
-        dbt run
-        """
-    )
     
     @task
     def end():
         EmptyOperator(task_id="end")
 
-    begin() >> truncate_table() >> copy_table() >> dbt_test >> end()
+    begin() >> truncate_table() >> copy_table() >>  end()
 
 copy_candidates_table()

@@ -27,6 +27,7 @@ After figuring out what data I would need, I made an ERD based on the data docum
 
 **Data Transformations:**
 - DBT (Data Build Tool)
+- SQL (of course)
 
 **Data Visualization / BI:**
 - Metabase
@@ -55,4 +56,10 @@ For these types of DAGs, I chose to convert the files into parquet files because
 
 ![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/9eb14128-a293-448d-b7a9-151c60e66b48)
 
+## Loading Data into Snowflake
 
+Before loading the data into the data warehouse, I had to make the tables (see ERD) and create an S3 stage for each table. To make the S3 stages, allow Snowflake access to my "./FEC" S3 Bucket. I created a custom role for Snowflake in AWS IAM and created the stages using a script like this:
+
+![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/718c8f42-505c-48c0-949f-85410ff8b382)
+
+\* Snowflake recommends using CREATE INTEGRATION to give access to S3 instead of using the AWS ID and AWS SECRET KEY!

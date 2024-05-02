@@ -45,7 +45,9 @@ There are two types of ingestion DAGs:
 
 **Example of a "Bulk Data" DAG (TLDR - Full code: [here](https://github.com/afoshiok/Money-and-Elections/blob/main/airflow/dags/ingestion/candidates.py)):**
 
+For these types of DAGs, I chose to convert the files into parquet files because it decreased my DAG runtimes and cut costs on S3 storage (Only $5, but hey money is money!). For example for the "Individual Contributions" DAG, the runtime went from **15m 57s → 5m 25s** and the file size went from **3.4 GB → 528.7 MB**
 ![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/cc7c0186-fa9b-451b-b188-e4b113c369e6)
+
 
 **Example of a "Web Scraper" DAG (TLDR - Full code: [here](https://github.com/afoshiok/Money-and-Elections/blob/main/airflow/dags/ingestion/report_types.py)):**
 

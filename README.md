@@ -78,3 +78,11 @@ Here's an example using the Candidates table:
 ![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/b30e2311-ae6d-41cb-af24-1bd1a7067107)
 
 ## Data Transformation (DBT)
+
+I used DBT to make data models to be used by Metabase. All my sources tables are placed in the "Election.Raw" schema, and all the models created with DBT are placed in the "Election.Analytics" schema. Below you will see the lineage graphs of the "src" models and the "fct" views they make. If you want to look at the full DBT project [look here](https://github.com/afoshiok/Money-and-Elections/tree/main/airflow/dbt/election_dbt).
+
+**Lineage Graphs (Click to make readable):**
+
+| src_candidates    | src_committee_transactions |
+| -------- | ------- |
+![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/81be76e9-e9cf-4a20-8497-d3730577bfbc) | ![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/7c7bada4-98a4-4336-8f36-ab73297a9195)

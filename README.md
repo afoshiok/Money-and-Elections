@@ -42,7 +42,7 @@ After figuring out what data I would need, I made an ERD based on the data docum
 There are two types of ingestion DAGs:
 
 1. DAGs that download the bulk data from the FEC website.
-2. DAGs that scrape data straight from the tables on the FEC website. These DAGs are reserved for data used in "type" tables (i.e. Report Type, Transaction Type, and Political Parties).
+2. DAGs that scrape data straight from the tables on the FEC website. These DAGs are reserved for data in "type" tables (i.e. Report Type, Transaction Type, and Political Parties).
 
 **Example of a "Bulk Data" DAG (TLDR - Full code: [here](https://github.com/afoshiok/Money-and-Elections/blob/main/airflow/dags/ingestion/candidates.py)):**
 
@@ -63,3 +63,18 @@ Before loading the data into the data warehouse, I had to make the tables (see E
 ![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/718c8f42-505c-48c0-949f-85410ff8b382)
 
 \* Snowflake recommends using CREATE INTEGRATION to give access to S3 instead of using the AWS ID and AWS SECRET KEY!
+
+A corresponding COPY INTO DAG is triggered at the end of both types of ingestion DAGs in the previous section. These DAGs follow these steps:
+
+1. The DAG receives a run date as a parameter.
+2. Truncate the table in Snowflake to avoid duplicate data.
+3. Copy the data into the table using the run date parameter.
+4. Run DBT models*
+
+  \* Didn't add it because I use DBT locally instead of DBT cloud, and Airflow wasn't cooperating with DBT.
+
+Here's an example using the Candidates table:
+
+![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/b30e2311-ae6d-41cb-af24-1bd1a7067107)
+
+## Data Transformation (DBT)

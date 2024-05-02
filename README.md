@@ -47,6 +47,8 @@ There are two types of ingestion DAGs:
 
 ![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/cc7c0186-fa9b-451b-b188-e4b113c369e6)
 
+**Example of a "Web Scraper" DAG (TLDR - Full code: [here](https://github.com/afoshiok/Money-and-Elections/blob/main/airflow/dags/ingestion/report_types.py)):**
 
+![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/9eb14128-a293-448d-b7a9-151c60e66b48)
 
 

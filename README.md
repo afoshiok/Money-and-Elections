@@ -8,14 +8,29 @@ Election year has finally rolled back around. You know what that means? Millions
 ![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/77615769-dd93-4149-a74e-df885caf6d81)
 
 ## ERD
+After figuring out what data I would need, I made an ERD based on the data documentation provided by the [FEC](https://www.fec.gov/data/browse-data/?tab=bulk-data). Each table has an ingestion DAG to move the data from the CSVs to an S3 bucket.
+
+
 ![2024 Election ERD](https://github.com/afoshiok/Money-and-Elections/assets/89757138/c6408dd5-978a-45c2-86a3-a214682e15a5)
+
+## Data Ingestion
+
+There are two types of ingestion DAGs:
+
+1. DAGs that download the bulk data from the FEC website.
+2. DAGs that scrape data straight from the tables on the FEC website. These DAGs are reserved for data used in "type" tables (i.e. Report Type, Transaction Type, and Political Parties).
+
+**Example of a "Bulk Data" DAG (TLDR - Full code: [here](https://github.com/afoshiok/Money-and-Elections/blob/main/airflow/dags/ingestion/candidates.py)):**
+
+![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/cc7c0186-fa9b-451b-b188-e4b113c369e6)
+
 
 
 ## Data Stack
 **Data Orchestration:**
 - Apache Airflow
 
-**Data Processing:**
+**Data Processing/Cleaning:**
 - Polars
 - Pandas
 

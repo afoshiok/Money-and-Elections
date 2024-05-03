@@ -86,3 +86,13 @@ I used DBT to make data models to be used by Metabase. All my sources tables are
 | src_candidates    | src_committee_transactions |
 | -------- | ------- |
 ![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/81be76e9-e9cf-4a20-8497-d3730577bfbc) | ![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/7c7bada4-98a4-4336-8f36-ab73297a9195)
+
+| src_committees | src_independent_exp |
+| -------- | ------- |
+![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/0550e029-68ee-46b9-9ca7-6079a4019718) | ![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/f42e515c-2719-4529-8a26-5f71a069ac12)
+
+| src_individual_cont | src_operating_exp |
+| -------- | ------- |
+![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/5d9a3d49-ad56-4f86-a278-8b53d5ad6fc7) | ![image](https://github.com/afoshiok/Money-and-Elections/assets/89757138/c4caaf59-231a-40ee-94f4-4618fb0e0760)
+
+
